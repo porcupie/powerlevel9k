@@ -1418,6 +1418,9 @@ prompt_kubecontext() {
   local kubectl_version="$(kubectl version --client 2>/dev/null)"
 
   if [[ -n "$kubectl_version" ]]; then
+    # only show if in a kube context or has default config file
+    if [[ -z "$KUBECONFIG" && ! -r "$HOME/.kube/config" ]] && return
+
     # Get the current Kubernetes config context's namespaece
     local k8s_namespace=$(kubectl config get-contexts --no-headers | grep '*' | awk '{print $5}')
     # Get the current Kuberenetes context
@@ -1429,13 +1432,13 @@ prompt_kubecontext() {
 
     local k8s_final_text=""
 
-    if [[ "$k8s_context" == "k8s_namespace" ]]; then
+    # NOTE: also context name sometimes has namespace embedded ... check with grep
+    if [[ `echo "$k8s_context" | grep "$k8s_namespace" 2>1 >/dev/null` ]]; then
       # No reason to print out the same identificator twice
       k8s_final_text="$k8s_context"
     else
       k8s_final_text="$k8s_context/$k8s_namespace"
     fi
-
 
     "$1_prompt_segment" "$0" "$2" "magenta" "white" "$k8s_final_text" "KUBERNETES_ICON"
   fi
