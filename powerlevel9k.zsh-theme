@@ -1433,7 +1433,7 @@ prompt_kubecontext() {
     local k8s_final_text=""
 
     # NOTE: also context name sometimes has namespace embedded ... check with grep
-    if [[ `echo "$k8s_context" | grep "$k8s_namespace" 2>1 >/dev/null` ]]; then
+    if [[ `echo "$k8s_context" | grep "$k8s_namespace" 2>/dev/null` ]]; then
       # No reason to print out the same identifier twice
       k8s_final_text="$k8s_context"
     else
